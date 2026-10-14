@@ -49,6 +49,41 @@ module async_fifo #(
     wire [ADDR_WIDTH-1:0] waddr = wbin[ADDR_WIDTH-1:0];
     wire [ADDR_WIDTH-1:0] raddr = rbin[ADDR_WIDTH-1:0];
 
+    //3.存储体
+    //这里可以不复位，真实芯片里是 SEAM/BRAM，因为给存储阵列加复位会吃掉大量布线资源，工程上不做
+    reg [DATA_DEPTH-1:0] mem [0:DEPTH-1];
+
+    always @(posedge wclk) begin
+        if (wen) mem[waddr] <= wdata;
+    end
+
+    assign rdate = mem[raddr];
+
+    //4.二进制指针 -> 格雷码
+    //  复用已有的模块，跨时钟域前必须转格雷码
+    //  不然的话多位同时翻转会被对面采到乱码指针
+    wire [PTR_WIDTH-1:0] wgray;
+    wire [PTR_WIDTH-1:0] rgray;
+
+    // output declaration of module bin2gray
+    wire [PTR_WIDTH-1:0] gray;
+    
+    bin2gray #(.PTR_WIDTH(PTR_WIDTH))u_b2gw(
+        .bin  	(wbin   ),
+        .gray 	(wgray  )
+    );
+    
+    bin2gray #(.PTR_WIDTH(PTR_WIDTH))u_b2gr(
+        .bin  	(rbin   ),
+        .gray 	(rgray  )
+    );
+
+    //5.跨时钟域：两级同步器
+    //  写指针送到读时钟域判空，把读指针送到写时钟域判满
+    //  同步会带来 2 拍延迟，所以空满标志是“保守”的
+    //  ——可能会提前报空/满，但不会丢数据
+    reg [PTR_WIDTH-1:0] wbin_sync;
+    reg [PTR_WIDTH-1:0] rbin_sync;
     
 
 endmodule
