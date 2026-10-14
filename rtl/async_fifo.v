@@ -82,8 +82,32 @@ module async_fifo #(
     //  写指针送到读时钟域判空，把读指针送到写时钟域判满
     //  同步会带来 2 拍延迟，所以空满标志是“保守”的
     //  ——可能会提前报空/满，但不会丢数据
-    reg [PTR_WIDTH-1:0] wbin_sync;
-    reg [PTR_WIDTH-1:0] rbin_sync;
+    reg [PTR_WIDTH-1:0] wbin_sync;  //写指针同步到读时钟域
+    reg [PTR_WIDTH-1:0] rbin_sync;  //读指针同步到写时钟域
+
+    aync_two_stage #(.WIDTH(PTR_WIDTH)) u_sync_w2r (
+        .rclk  (rclk),
+        .rrst_n(rrst_n),
+        .din   (wgray),
+        .dout  (wgray_in_rclk)
+    );
+
+    sync_two_stage #(.WIDTH(PTR_WIDTH)) u_sync_r2w (
+        .rclk  (wclk),
+        .rrst_n(wrst_n),
+        .din   (rgray),
+        .dout  (rgray_in_wclk)
+    );
+
+    //6.空满判断（全部在格雷码比较，不需要转回二进制）
+    //  空：写指针和读指针相等
+    //  满：指针追平后多跑了一圈，也就是最高两位相反，其余位相同
+
+    assign rempty = (rgary == wgray);
+
+    assign wfull = (wgray[PTR_WIDTH-1] != rgary_in_wclk[PTR_WIDTH-1]) &&
+                   (wgray[PTR_WIDTH-2] != rgary_in_wclk[PTR_WIDTH-2]) &&
+                   (wgray[PTR_WIDTH-3:0] == rgary_in_wclk[PTR_WIDTH-3:0]);
     
 
 endmodule
