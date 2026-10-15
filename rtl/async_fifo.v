@@ -19,7 +19,7 @@ module async_fifo #(
     output wire                 rempty //读空标志
 );
 
-    localparam DEPTH     = 1 << ADDR_WIDTH;     //16
+    localparam DEPTH     = 1 << ADDR_WIDTH;     //1左移ADD_WIDTH位，例如左移四位，就是'b10000，即16
     localparam PTR_WIDTH = ADDR_WIDTH + 1;      //指针比地址多一位，用来区分空和满
 
     //1.读写使能：空满标志会挡掉非法操作，这一层是整个FIFO的保险丝
