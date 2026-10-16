@@ -14,7 +14,7 @@ module tb_async_fifo;
     wire                 wfull;
 
     reg                  rclk, rrst_n, rinc;
-    wire [DATA_WIDTH-1:0] rtada;
+    wire [DATA_WIDTH-1:0] rdata;
     wire                 rempty;
 
     integer i;
@@ -153,7 +153,7 @@ module tb_async_fifo;
         expect_bit(rempty, 1'b0);
 
         if (errors == 0) $display("=== SAYNC FIFO ALL CASES PASS ===");
-        `else            $display("=== %0d FAILURES ===", errors);
+        else             $display("=== %0d FAILURES ===", errors);
         $finish; 
     end
 
