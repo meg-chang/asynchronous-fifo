@@ -30,5 +30,8 @@
 - scoreboard 比对通过，数据无丢失无重复
 - （附波形截图）
 
-## 6. 参考
+## 6. 遇到的问题，产生的疑问
+    1.最后判断空满的时候，不小心把编码方式搞混，产生了判断满状态是最高位不同，其余位相同的认知，忽略了格雷码和二进制判定不同，导致结果出错。这是由于格雷码每加2^n时，对应的格雷码会在最高位和次高位同时翻转，所以需要比较前两位。
+
+## 7. 参考
 - Clifford Cummings, "Simulation and Synthesis Techniques for Asynchronous FIFO Design"
