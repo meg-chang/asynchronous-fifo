@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 //格雷码转二进制
 
 module gray2bin #(parameter PTR_WIDTH = 4)(

@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 //异步 FIFO主体
 //结构：双口 RAM + 二进制指针 ＋ 格雷码编码 + 二级同步器 + 空满判断
 
@@ -82,8 +83,8 @@ module async_fifo #(
     //  写指针送到读时钟域判空，把读指针送到写时钟域判满
     //  同步会带来 2 拍延迟，所以空满标志是“保守”的
     //  ——可能会提前报空/满，但不会丢数据
-    reg [PTR_WIDTH-1:0] wbin_sync;  //写指针同步到读时钟域
-    reg [PTR_WIDTH-1:0] rbin_sync;  //读指针同步到写时钟域
+    wire [PTR_WIDTH-1:0] wgray_in_rclk;  //写指针(格雷码)同步到读时钟域后的版本
+    wire [PTR_WIDTH-1:0] rgray_in_wclk;  //读指针(格雷码)同步到写时钟域后的版本
 
     sync_two_stage #(.WIDTH(PTR_WIDTH)) u_sync_w2r (
         .rclk  (rclk),

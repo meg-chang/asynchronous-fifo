@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 //二进制转换为格雷码
 
 module bin2gray #(

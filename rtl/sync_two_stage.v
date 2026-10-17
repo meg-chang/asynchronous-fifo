@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 //二级同步器
 
 module sync_two_stage #(parameter WIDTH = 5)(
